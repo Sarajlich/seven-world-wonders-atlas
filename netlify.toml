@@ -1,0 +1,18 @@
+[build]
+  publish = "public"
+  functions = "netlify/functions"
+
+[[redirects]]
+  from = "/api/wonders/:slug"
+  to = "/.netlify/functions/wonders?slug=:slug"
+  status = 200
+
+[[redirects]]
+  from = "/api/wonders"
+  to = "/.netlify/functions/wonders"
+  status = 200
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
