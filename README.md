@@ -1,4 +1,4 @@
-##Seven Wonders Atlas
+***Seven Wonders Atlas***
 
 An interactive web atlas for exploring the New Seven Wonders of the World. The app combines a rotatable 3D globe, location pins, monument detail pages, image galleries, historical facts, and embedded maps.
 
