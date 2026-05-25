@@ -589,8 +589,7 @@ h3 {
   #app,
   .loading,
   .error-state,
-  .home,
-  .wonder-hero {
+  .home {
     min-height: calc(100vh - 76px);
   }
 
@@ -625,11 +624,42 @@ h3 {
 
   .gallery-grid img,
   .gallery-grid img:first-child {
+    display: block;
+    height: auto;
     min-height: 300px;
   }
 
   .wonder-hero {
-    padding-inline: 18px;
+    display: block;
+    min-height: auto;
+    padding: 92px 18px 24px;
+    background:
+      linear-gradient(180deg, rgba(5, 7, 5, 0.12) 0%, rgba(5, 7, 5, 0.72) 48%, rgba(5, 7, 5, 0.94) 100%),
+      var(--hero-image) center top / cover;
+  }
+
+  .wonder-hero-inner {
+    gap: 18px;
+  }
+
+  .wonder-hero p {
+    margin-top: 16px;
+  }
+
+  .meta-strip,
+  .map-panel,
+  .fact-list li,
+  .nearby-card {
+    background: #11150f;
+  }
+
+  .content-band {
+    margin-top: 34px;
+  }
+
+  .map-band,
+  .nearby-grid {
+    margin-top: 34px;
   }
 
   .content-band,
