@@ -1,6 +1,3 @@
-import * as THREE from "three";
-import { OrbitControls } from "three/addons/controls/OrbitControls.js";
-
 const app = document.querySelector("#app");
 let wonders = [];
 let globeCleanup = null;
@@ -176,7 +173,18 @@ function renderRoute() {
   app.focus({ preventScroll: true });
 }
 
-function latLngToVector3(lat, lng, radius) {
+function deferGlobeStartup() {
+  return new Promise((resolve) => {
+    const schedule = window.requestIdleCallback || ((callback) => setTimeout(callback, 350));
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        schedule(resolve, { timeout: 900 });
+      });
+    });
+  });
+}
+
+function latLngToVector3(THREE, lat, lng, radius) {
   const phi = THREE.MathUtils.degToRad(90 - lat);
   const theta = THREE.MathUtils.degToRad(lng + 180);
   return new THREE.Vector3(
@@ -186,17 +194,32 @@ function latLngToVector3(lat, lng, radius) {
   );
 }
 
-function initGlobe() {
+async function initGlobe() {
   const canvas = document.querySelector("#globe-canvas");
   const frame = canvas?.parentElement;
   if (!canvas || !frame) return;
+
+  let cancelled = false;
+  globeCleanup = () => {
+    cancelled = true;
+  };
+
+  await deferGlobeStartup();
+  if (cancelled) return;
+
+  const [THREE, controlsModule] = await Promise.all([
+    import("three"),
+    import("three/addons/controls/OrbitControls.js")
+  ]);
+  const { OrbitControls } = controlsModule;
+  if (cancelled) return;
 
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(36, 1, 0.1, 100);
   camera.position.set(0, 0.4, 4.2);
 
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.75));
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.1;
@@ -235,7 +258,7 @@ function initGlobe() {
   scene.add(globe);
 
   const earth = new THREE.Mesh(
-    new THREE.SphereGeometry(1, 96, 96),
+    new THREE.SphereGeometry(1, 64, 64),
     new THREE.MeshPhongMaterial({
       map: earthMap,
       normalMap,
@@ -248,7 +271,7 @@ function initGlobe() {
   globe.add(earth);
 
   const clouds = new THREE.Mesh(
-    new THREE.SphereGeometry(1.012, 96, 96),
+    new THREE.SphereGeometry(1.012, 64, 64),
     new THREE.MeshLambertMaterial({
       map: cloudMap,
       transparent: true,
@@ -259,7 +282,7 @@ function initGlobe() {
   globe.add(clouds);
 
   const atmosphere = new THREE.Mesh(
-    new THREE.SphereGeometry(1.04, 96, 96),
+    new THREE.SphereGeometry(1.04, 64, 64),
     new THREE.MeshBasicMaterial({
       color: 0x73d9ff,
       transparent: true,
@@ -272,7 +295,7 @@ function initGlobe() {
 
   const pinMeshes = [];
   wonders.forEach((wonder) => {
-    const normal = latLngToVector3(wonder.coordinates.lat, wonder.coordinates.lng, 1).normalize();
+    const normal = latLngToVector3(THREE, wonder.coordinates.lat, wonder.coordinates.lng, 1).normalize();
     const group = new THREE.Group();
     group.position.copy(normal.multiplyScalar(1.045));
     group.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), normal.clone().normalize());
@@ -318,6 +341,7 @@ function initGlobe() {
   const raycaster = new THREE.Raycaster();
   const pointer = new THREE.Vector2();
   let animationFrame = 0;
+  let isPageVisible = true;
 
   function resize() {
     const rect = frame.getBoundingClientRect();
@@ -351,6 +375,7 @@ function initGlobe() {
 
   function animate() {
     animationFrame = requestAnimationFrame(animate);
+    if (!isPageVisible) return;
     clouds.rotation.y += 0.0008;
     pinMeshes.forEach((pin, index) => {
       const scale = 1 + Math.sin(performance.now() * 0.003 + index) * 0.08;
@@ -360,19 +385,34 @@ function initGlobe() {
     renderer.render(scene, camera);
   }
 
+  function handleVisibilityChange() {
+    isPageVisible = document.visibilityState === "visible";
+  }
+
   resize();
   animate();
   window.addEventListener("resize", resize);
+  document.addEventListener("visibilitychange", handleVisibilityChange);
   canvas.addEventListener("click", pickPin);
   canvas.addEventListener("pointermove", handleMove);
 
   globeCleanup = () => {
+    cancelled = true;
     cancelAnimationFrame(animationFrame);
     window.removeEventListener("resize", resize);
+    document.removeEventListener("visibilitychange", handleVisibilityChange);
     canvas.removeEventListener("click", pickPin);
     canvas.removeEventListener("pointermove", handleMove);
     controls.dispose();
     renderer.dispose();
+    scene.traverse((object) => {
+      object.geometry?.dispose?.();
+      if (Array.isArray(object.material)) {
+        object.material.forEach((material) => material.dispose?.());
+      } else {
+        object.material?.dispose?.();
+      }
+    });
   };
 }
 
