@@ -2,7 +2,6 @@ import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 
 const app = document.querySelector("#app");
-const topnav = document.querySelector("#topnav");
 let wonders = [];
 let globeCleanup = null;
 
@@ -17,15 +16,6 @@ async function loadWonders() {
   const response = await fetch("/api/wonders");
   if (!response.ok) throw new Error("Could not load wonders");
   return response.json();
-}
-
-function setActiveNav(slug) {
-  topnav.innerHTML = wonders
-    .map(
-      (wonder) =>
-        `<a class="nav-link ${wonder.slug === slug ? "active" : ""}" href="/wonder/${wonder.slug}" data-link>${wonder.name}</a>`
-    )
-    .join("");
 }
 
 function navigate(path) {
@@ -45,7 +35,6 @@ document.addEventListener("click", (event) => {
 window.addEventListener("popstate", renderRoute);
 
 function renderHome() {
-  setActiveNav("");
   app.innerHTML = `
     <section class="home">
       <div class="home-copy">
@@ -91,7 +80,6 @@ function renderWonder(slug) {
     return;
   }
 
-  setActiveNav(slug);
   const otherWonders = wonders.filter((item) => item.slug !== slug).slice(0, 3);
   const mapUrl = `https://www.google.com/maps?q=${wonder.coordinates.lat},${wonder.coordinates.lng}&z=9&output=embed`;
 

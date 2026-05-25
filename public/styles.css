@@ -67,7 +67,7 @@ button {
   z-index: 20;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   min-height: 76px;
   padding: 0 32px;
   border-bottom: 1px solid var(--line);
@@ -76,7 +76,6 @@ button {
 }
 
 .brand,
-.nav-link,
 .back-link,
 .wonder-link {
   transition: color 180ms ease, border-color 180ms ease, background 180ms ease, transform 180ms ease;
@@ -96,35 +95,6 @@ button {
   border: 2px solid var(--gold);
   border-radius: 50%;
   box-shadow: inset -6px 2px 0 rgba(102, 198, 216, 0.38), 0 0 24px rgba(215, 168, 79, 0.34);
-}
-
-.topnav {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  overflow-x: auto;
-  scrollbar-width: none;
-}
-
-.topnav::-webkit-scrollbar {
-  display: none;
-}
-
-.nav-link {
-  flex: 0 0 auto;
-  padding: 10px 13px;
-  border: 1px solid transparent;
-  border-radius: 999px;
-  color: var(--muted);
-  font-size: 0.82rem;
-  font-weight: 800;
-}
-
-.nav-link:hover,
-.nav-link.active {
-  color: var(--ink);
-  border-color: var(--line);
-  background: rgba(245, 239, 228, 0.08);
 }
 
 #app {
@@ -612,10 +582,7 @@ h3 {
 
 @media (max-width: 760px) {
   .topbar {
-    align-items: flex-start;
-    flex-direction: column;
-    gap: 10px;
-    min-height: 112px;
+    min-height: 76px;
     padding: 16px 18px;
   }
 
@@ -624,11 +591,7 @@ h3 {
   .error-state,
   .home,
   .wonder-hero {
-    min-height: calc(100vh - 112px);
-  }
-
-  .topnav {
-    width: 100%;
+    min-height: calc(100vh - 76px);
   }
 
   .home {
