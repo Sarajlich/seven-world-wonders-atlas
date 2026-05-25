@@ -204,7 +204,7 @@ function initGlobe() {
   const controls = new OrbitControls(camera, canvas);
   controls.enableDamping = true;
   controls.enablePan = false;
-  controls.minDistance = 2.65;
+  controls.minDistance = 3.75;
   controls.maxDistance = 5.6;
   controls.rotateSpeed = 0.72;
   controls.autoRotate = true;
