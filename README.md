@@ -4,7 +4,7 @@ An interactive web atlas for exploring the New Seven Wonders of the World. The a
 
 **Live site:** [sevenworldwonders.netlify.app](https://sevenworldwonders.netlify.app/)
 
-<video src="public/seven-wonders-atlas-home.mp4" autoplay loop muted playsinline controls></video>
+<video src="seven-wonders-atlas-home.mp4" autoplay loop muted playsinline controls></video>
 
 ## What I built
 
